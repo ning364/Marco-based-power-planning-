@@ -6,6 +6,12 @@ Created on Sat May  3 12:49:03 2025
 
 Target: Build a macro-based placement power planning algorithem
 
+This Algorthem:
+    1 Only consider macro plased area.
+    2.Only support rectangle shaped.
+    3.The generate power-stripe would follow min-spacing, min-width DRC rule.
+    4. No consider io-pin
+
 """
 import numpy as np
 
