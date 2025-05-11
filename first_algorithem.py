@@ -216,7 +216,7 @@ def power_grid_pattern(design_box:list, macro_box:list, ishorizontal:bool, metal
         
         
         
-    idx_score=weight_macro_score(design,macro);
+    idx_score=weight_macro_score(design,macro_box);
     
     #print("CHECK OFF pattern number, offset,width:", number_pattern,pattern_offset, pattern_width);
     
@@ -281,10 +281,24 @@ def power_grid_pattern(design_box:list, macro_box:list, ishorizontal:bool, metal
     return pattern_list,down_score,up_score,pattern_width;
     
     
-#Define any single idx score! 
-def weight_macro_score(design_box:list, macro_box:list):
+#If macro is no-score defined on user it would use area-score!
+def weight_macro_score(design_box:list, macro_box:list, ishorizontal:bool):
     row=design_box[3]-design_box[1]+1;
     col=design_box[2]-design_box[0]+1;
+    
+    macro_area=[];
+    print(macro_box)
+    if(len(macro_box[0])==4):
+        for macro in macro_box:
+            macro_row=macro[3]-macro[1]+1;
+            macro_col=macro[2]-macro[0]+1;
+            macro.append(macro_row*macro_col);
+            macro_area.append(macro_row*macro_col);
+     
+        macro_area=normalization_score1(macro_area);
+        
+        for idx in range(len(macro_box)):
+            macro_box[idx][4]=macro_area[idx];
     
     idx_score = [[0] * row for _ in range(col)]
     for mdx in macro_box:
@@ -292,9 +306,6 @@ def weight_macro_score(design_box:list, macro_box:list):
         for idx in range(mdx[0],mdx[2]+1):
             for idy in range(mdx[1], mdx[3]+1):
                 idx_score[idx][idy]+=score;
-    
-    
-    
     
     return idx_score;
 
@@ -327,6 +338,20 @@ def merge_pattern(pattern_list:list):
     return merge_list;
 
 #Normailized score to 
+def normalization_score1(pattern_list:list):
+    score_list=[]
+    for score in pattern_list:
+        score_list.append(score);
+        
+    #mi=np.min(score_list);
+    mi=0;
+    ma=np.max(score_list);
+   
+    for idx in range(len(pattern_list)):
+        pattern_list[idx]=(pattern_list[idx]-mi)/(ma-mi);
+        
+    return pattern_list;
+
 def normalization_score(pattern_list:list):
     score_list=[]
     for score in pattern_list:
@@ -340,7 +365,7 @@ def normalization_score(pattern_list:list):
     return pattern_list;
    
 def macro_based_power_planning(design_box:list, macro_box:list,metal_spacing:int, metal_width:int, opt_type:str):
-    pattern_list,down_score,up_score,pattern_width=power_grid_pattern(design,macro,True,metal_spacing,metal_width,1);
+    pattern_list,down_score,up_score,pattern_width=power_grid_pattern(design,macro_box,True,metal_spacing,metal_width,1);
     print("End of power_grid_pattern:")
     #print(pattern_list)
     #print(down_score)
