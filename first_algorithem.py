@@ -357,10 +357,11 @@ def normalization_score(pattern_list:list):
     for score in pattern_list:
         score_list.append(score[0]);
         
-    mi=np.min(score_list);
+    #mi=np.min(score_list);
+    mi=0;
     ma=np.max(score_list);
     for pattern in pattern_list:
-        pattern[0]=(pattern[0]-mi)/ma-mi;
+        pattern[0]=(pattern[0]-mi)/(ma-mi);
         
     return pattern_list;
    
